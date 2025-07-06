@@ -15,11 +15,13 @@ parser = argparse.ArgumentParser(description="Track Crypto Prices")
 parser.add_argument(
     "-c","--coin",
     nargs="+",
-    default=["bitcoin"],
     help= "coins to track"
 )
 args = parser.parse_args()
-coin = args.coin[0].lower()
+if args.coin: 
+    coin = args.coin[0].lower()
+else:
+    coin = input("Enter the coin you want to track: ").strip().lower()
 
 
 url = "https://api.coingecko.com/api/v3/simple/price"
@@ -49,7 +51,7 @@ try:
                 print(Fore.GREEN + f"As of {now}, Price of {coin} is ${price}.")
             else:
                 print(Fore.RED + f"{coin.upper()} not found or is invalid")
-            
+                break
             time.sleep(20)
         
         except requests.exceptions.RequestException as e:
