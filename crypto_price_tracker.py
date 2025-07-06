@@ -14,14 +14,32 @@ colorama.init(autoreset=True)
 parser = argparse.ArgumentParser(description="Track Crypto Prices")
 parser.add_argument(
     "-c","--coin",
-    nargs="+",
     help= "coins to track"
 )
+
+parser.add_argument(
+    "-cur","--currency",
+    type=str,
+    help= "choose currency"
+)
+
 args = parser.parse_args()
+
 if args.coin: 
-    coin = args.coin[0].lower()
+    coin = args.coin.lower()
 else:
     coin = input("Enter the coin you want to track: ").strip().lower()
+
+if args.currency:
+    currency = args.currency.lower()
+else:
+    change_currency = input("Default currency is USD, do you want to change it? (y/n) ").strip().lower()
+    
+    if change_currency == "y":
+        currency = input("Enter currency (eg. usd, inr, eur): ").strip().lower()
+        print(Fore.CYAN + f"Tracking price of {coin.upper()} in {currency.upper()}")
+    else:
+        currency = "usd"
 
 
 url = "https://api.coingecko.com/api/v3/simple/price"
@@ -34,7 +52,7 @@ try:
         try:
             params ={
                 "ids": coin,
-                "vs_currencies": "usd"
+                "vs_currencies": currency
             }
             response = requests.get(url, params=params)
             
@@ -46,13 +64,13 @@ try:
             response.raise_for_status()
             data = response.json()
             
-            price = data.get(coin, {}).get("usd")
+            price = data.get(coin, {}).get(currency)
             if price:
-                print(Fore.GREEN + f"As of {now}, Price of {coin} is ${price}.")
+                print(Fore.GREEN + f"As of {now}, Price of {coin} is {currency.upper()} {price}.")
             else:
                 print(Fore.RED + f"{coin.upper()} not found or is invalid")
                 break
-            time.sleep(20)
+            time.sleep(30)
         
         except requests.exceptions.RequestException as e:
 
@@ -64,11 +82,3 @@ try:
             
 except KeyboardInterrupt:
     print(Fore.RED + "Interrupted by the user.")
-    
-
-        
-            
-    
-        
-        
-        
