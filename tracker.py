@@ -16,7 +16,8 @@ parser = argparse.ArgumentParser(description="Track Crypto Prices")
 parser.add_argument(
     "-c", "--coin",
     required=True,
-    help="Coin to track (e.g. bitcoin, ethereum)"
+    nargs="+",
+    help="Coins to track (e.g. bitcoin, ethereum)"
 )
 
 parser.add_argument(
@@ -27,11 +28,13 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-coin = args.coin.lower()
+coins = [c.lower() for c in args.coin]
+id_parms = ",".join(coins)
 currency = args.currency.lower()
 
 url = "https://api.coingecko.com/api/v3/simple/price"
 response = None
+last_price = {}
 
 try:
     while True:
@@ -39,7 +42,7 @@ try:
 
         try:
             params = {
-                "ids": coin,
+                "ids": id_parms,
                 "vs_currencies": currency
             }
             response = requests.get(url, params=params)
@@ -51,24 +54,29 @@ try:
 
             response.raise_for_status()
             data = response.json()
-
-            coin_data = data.get(coin)
-
-            if coin_data is None:
-                print(Fore.RED + f"Coin '{coin}' not found or is invalid.")
-                break
-
-            if not coin_data: 
-                print(Fore.RED + f"Currency '{currency}' not found or is invalid for coin '{coin}'.")
-                break
-
-            price = coin_data.get(currency)
-            if price is None:
-                print(Fore.RED + f"Currency '{currency}' not found or is invalid for coin '{coin}'.")
-                break
             
-            print(Fore.GREEN + f"As of {now}, Price of {coin} is {currency.upper()} {price}.")
-            time.sleep(30)
+            for coin in coins:
+                
+                coin_data = data.get(coin)
+
+                if coin_data is None:
+                    print(Fore.RED + f"Coin '{coin}' not found or is invalid.")
+                    break
+
+                if not coin_data: 
+                    print(Fore.RED + f"Currency '{currency}' not found or is invalid for coin '{coin}'.")
+                    break
+
+                price = coin_data.get(currency)
+                
+                if price is None:
+                    print(Fore.RED + f"Currency '{currency}' not found or is invalid for coin '{coin}'.")
+                    break
+                if last_price.get(coin) != price:
+                    print(Fore.GREEN + f"[{now}] {coin.upper()}: {price} {currency.upper()}")
+                    last_price[coin] = price
+            
+            time.sleep(15)
             
         except requests.exceptions.RequestException as e:
             short_error = str(e).split('\n')[0]
