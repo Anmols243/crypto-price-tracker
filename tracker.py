@@ -60,20 +60,21 @@ try:
                 coin_data = data.get(coin)
 
                 if coin_data is None:
-                    print(Fore.RED + f"Coin '{coin}' not found or is invalid.")
+                    print(Fore.RED + f"'{coin}' not found or is invalid.")
                     break
 
                 if not coin_data: 
-                    print(Fore.RED + f"Currency '{currency}' not found or is invalid for coin '{coin}'.")
+                    print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.")
                     break
 
                 price = coin_data.get(currency)
                 
                 if price is None:
-                    print(Fore.RED + f"Currency '{currency}' not found or is invalid for coin '{coin}'.")
+                    print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.")
                     break
+                
                 if last_price.get(coin) != price:
-                    print(Fore.GREEN + f"[{now}] {coin.upper()}: {price} {currency.upper()}")
+                    print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
                     last_price[coin] = price
             
             time.sleep(15)
