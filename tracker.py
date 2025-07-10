@@ -1,8 +1,3 @@
-"""
-Crypto Price Tracker CLI Tool
-Fetches real-time Crypto price using CoinGecko API every 20 seconds.
-Displays color-coded output with timestamp and handles errors gracefully.
-"""
 import argparse
 import requests
 import datetime
@@ -35,6 +30,7 @@ currency = args.currency.lower()
 url = "https://api.coingecko.com/api/v3/simple/price"
 response = None
 last_price = {}
+invalid_coins = set()
 
 try:
     while True:
@@ -58,20 +54,26 @@ try:
             for coin in coins:
                 
                 coin_data = data.get(coin)
+                
+                if coin in invalid_coins:
+                    continue
 
                 if coin_data is None:
-                    print(Fore.RED + f"'{coin}' not found or is invalid.")
-                    break
+                    print(Fore.RED + f"'{coin.upper()}' not found or is invalid.")
+                    invalid_coins.add(coin)
+                    continue
 
                 if not coin_data: 
                     print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.")
-                    break
+                    invalid_coins.add(coin)
+                    continue
 
                 price = coin_data.get(currency)
                 
                 if price is None:
                     print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.")
-                    break
+                    continue
+                    
                 
                 if last_price.get(coin) != price:
                     print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
