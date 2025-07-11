@@ -3,6 +3,8 @@ import requests
 import datetime
 import time
 import colorama
+import csv
+import os
 from colorama import Fore
 
 colorama.init(autoreset=True)
@@ -31,6 +33,8 @@ url = "https://api.coingecko.com/api/v3/simple/price"
 response = None
 last_price = {}
 invalid_coins = set()
+log_filename = "crypto_price_log.csv"
+file_exists = os.path.isfile(log_filename)
 
 try:
     while True:
@@ -78,6 +82,13 @@ try:
                 if last_price.get(coin) != price:
                     print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
                     last_price[coin] = price
+                    
+                    with open(log_filename, mode='a', newline="") as file:
+                        writer = csv.writer(file)
+                        if not file_exists:
+                            writer.writerow(["Timestamp", "Coin", "Price", "Currency"])
+                            file_exists = True
+                        writer.writerow([now , coin, price, currency])
             
             time.sleep(15)
             
