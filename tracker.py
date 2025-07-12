@@ -22,18 +22,24 @@ parser.add_argument(
     default="usd",
     help="Currency to display price in (e.g. usd, eur, inr). Default is usd."
 )
+parser.add_argument(
+    "-s", "--save",
+    default="crypto_price_log.csv",
+    help="Currency to display price in (e.g. usd, eur, inr). Default is usd."
+)
 
 args = parser.parse_args()
 
 coins = [c.lower() for c in args.coin]
 id_parms = ",".join(coins)
 currency = args.currency.lower()
+save = args.save
 
 url = "https://api.coingecko.com/api/v3/simple/price"
 response = None
 last_price = {}
 invalid_coins = set()
-log_filename = "crypto_price_log.csv"
+log_filename = save
 file_exists = os.path.isfile(log_filename)
 
 try:
