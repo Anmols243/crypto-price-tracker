@@ -83,16 +83,17 @@ try:
                     print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.") 
                     continue
                 
-                print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
-                last_price[coin] = price
-                
-                with open(log_filename, mode='a', newline="") as file:
-                    writer = csv.writer(file)
-                    if not file_exists:
-                        writer.writerow(["Timestamp", "Coin", "Price", "Currency"])
-                        file_exists = True
-                    
-                    writer.writerow([now, coin, price, currency])
+                if last_price.get(coin) != price:
+                    print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
+                    last_price[coin] = price
+
+                    with open(log_filename, mode='a', newline="") as file:
+                        writer = csv.writer(file)
+                        if not file_exists:
+                            writer.writerow(["Timestamp", "Coin", "Price", "Currency"]) 
+                            file_exists = True
+
+                        writer.writerow([now, coin, price, currency])
             
             time.sleep(15)
             
