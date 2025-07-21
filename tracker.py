@@ -14,9 +14,8 @@ parser.add_argument(
     "-c", "--coin",
     required=True,
     nargs="+",
-    help="Coins to track (e.g. bitcoin, ethereum)"
+    help="Coins to track (e.g. bitcoin, ethereum)"  
 )
-
 parser.add_argument(
     "-cur", "--currency",
     default="usd",
@@ -25,7 +24,7 @@ parser.add_argument(
 parser.add_argument(
     "-s", "--save",
     default="crypto_price_log.csv",
-    help="Currency to display price in (e.g. usd, eur, inr). Default is usd."
+    help="CSV filename to save price logs. Default is crypto_price_log.csv."
 )
 
 args = parser.parse_args()
@@ -81,22 +80,22 @@ try:
                 price = coin_data.get(currency)
                 
                 if price is None:
-                    print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.")
+                    print(Fore.RED + f"'{currency}' not found or is invalid for '{coin}'.") 
                     continue
-                    
                 
-                if last_price.get(coin) != price:
-                    print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
-                    last_price[coin] = price
+                print(Fore.GREEN + f"\n[{now}] {coin.upper()}: {price} {currency.upper()}")
+                last_price[coin] = price
+                
+                with open(log_filename, mode='a', newline="") as file:
+                    writer = csv.writer(file)
+                    if not file_exists:
+                        writer.writerow(["Timestamp", "Coin", "Price", "Currency"])
+                        file_exists = True
                     
-                    with open(log_filename, mode='a', newline="") as file:
-                        writer = csv.writer(file)
-                        if not file_exists:
-                            writer.writerow(["Timestamp", "Coin", "Price", "Currency"])
-                            file_exists = True
-                        writer.writerow([now , coin, price, currency])
+                    writer.writerow([now, coin, price, currency])
             
             time.sleep(15)
+            
             
         except requests.exceptions.RequestException as e:
             short_error = str(e).split('\n')[0]
