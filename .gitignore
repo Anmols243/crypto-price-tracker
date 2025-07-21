@@ -1,2 +1,2 @@
 *.csv
-crypto_price_log.csv
+__pycache__/
